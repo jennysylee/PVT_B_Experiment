@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brief Psychomotor Vigilance Test (PVT-B)</title>
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --success: #16a34a;
+            --warning: #ea580c;
+            --error: #dc2626;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Entry Page */
+        .entry-content {
+            background: var(--surface);
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .entry-content h1 {
+            font-size: 32px;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .entry-content p {
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            letter-spacing: 4px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+
+        .button {
+            padding: 12px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        }
+
+        .button:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Instructions Page */
+        .instructions-content {
+            background: var(--surface);
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+        }
+
+        .instructions-content h1 {
+            font-size: 28px;
+            margin-bottom: 24px;
+            color: var(--text);
+        }
+
+        .instructions-content h2 {
+            font-size: 18px;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .instructions-content ul {
+            margin-left: 20px;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        .instructions-content li {
+            margin-bottom: 8px;
+            line-height: 1.7;
+        }
+
+        .key-point {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 20px 0;
+            border-radius: 4px;
+            color: #92400e;
+        }
+
+        /* Experiment Page */
+        .experiment-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            background: var(--bg);
+        }
+
+        .task-header {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .monitoring-box {
+            width: 200px;
+            height: 100px;
+            border: 3px solid #dc2626;
+            background-color: var(--surface);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .stimulus-display {
+            font-size: 48px;
+            color: #facc15;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            min-height: 80px;
+        }
+
+        .feedback-message {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 30px;
+            min-height: 60px;
+            text-align: center;
+            color: var(--text);
+        }
+
+        .feedback-message.correct {
+            color: var(--success);
+        }
+
+        .feedback-message.error {
+            color: var(--error);
+        }
+
+        .feedback-message.warning {
+            color: var(--warning);
+        }
+
+        .feedback-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 8px;
+            background-color: var(--border);
+            border-radius: 4px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .trial-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+
+        /* Results Page */
+        .results-container {
+            background: var(--surface);
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .results-container h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .results-container .participant-id {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .result-card {
+            background-color: var(--bg);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .result-card h3 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .result-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .result-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .interpretation {
+            background-color: #f0fdf4;
+            border-left: 4px solid var(--success);
+            padding: 20px;
+            border-radius: 4px;
+            margin-top: 30px;
+        }
+
+        .interpretation h3 {
+            color: var(--text);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .interpretation p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .button-secondary {
+            background-color: var(--border);
+            color: var(--text);
+        }
+
+        .button-secondary:hover {
+            background-color: #cbd5e1;
+        }
+
+        @media (max-width: 768px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .entry-content,
+            .instructions-content,
+            .results-container {
+                padding: 40px;
+                max-width: 100%;
+            }
+
+            .entry-content h1 {
+                font-size: 24px;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Entry Page -->
+        <div class="page active" id="entryPage">
+            <div class="entry-content">
+                <h1>PVT-B Experiment</h1>
+                <p>Brief Psychomotor Vigilance Test</p>
+                
+                <form id="entryForm" onsubmit="handleEntrySubmit(event)">
+                    <div class="form-group">
+                        <label for="participantNumber">Participant Number (3 digits)</label>
+                        <input 
+                            type="text" 
+                            id="participantNumber" 
+                            placeholder="000" 
+                            maxlength="3"
+                            inputmode="numeric"
+                            required
+                        >
+                        <div class="error-message" id="errorMessage">Please enter a valid 3-digit number</div>
+                    </div>
+                    <button type="submit" class="button">Start Instructions</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Instructions Page -->
+        <div class="page" id="instructionsPage">
+            <div class="instructions-content">
+                <h1>Instructions</h1>
+                
+                <div class="key-point">
+                    <strong>Your Task:</strong> Monitor a red box on the screen. When yellow numbers appear, press the spacebar as quickly as possible.
+                </div>
+
+                <h2>Important Guidelines:</h2>
+                <ul>
+                    <li><strong>React quickly:</strong> Press spacebar immediately when you see the yellow counter appear</li>
+                    <li><strong>Don't anticipate:</strong> Don't press too early; you will get an error if you press before the numbers appear</li>
+                    <li><strong>Stay focused:</strong> The test lasts 3 minutes. Keep your attention on the red box throughout</li>
+                    <li><strong>Accurate performance:</strong> Your reaction time will be measured in milliseconds</li>
+                </ul>
+
+                <h2>What You'll See:</h2>
+                <ul>
+                    <li>A red monitoring box in the center of the screen</li>
+                    <li>Yellow numbers will appear at random intervals between 0-3 seconds</li>
+                    <li>You will receive feedback after each response (1 second)</li>
+                    <li>The numbers will indicate your reaction time in milliseconds</li>
+                </ul>
+
+                <h2>Scoring:</h2>
+                <ul>
+                    <li><strong>Correct (green):</strong> Reaction time between 100-500 ms</li>
+                    <li><strong>Too Slow (red):</strong> Reaction time > 500 ms (lapse)</li>
+                    <li><strong>Error (red):</strong> Pressing too early (&lt; 100 ms) or before stimulus appears</li>
+                </ul>
+
+                <div style="margin-top: 40px;">
+                    <button class="button" onclick="showExperiment()">Begin Experiment</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Experiment Page -->
+        <div class="page" id="experimentPage">
+            <div class="experiment-container">
+                <div class="task-header" id="taskHeader">Press SPACEBAR when yellow numbers appear</div>
+                
+                <div class="monitoring-box">
+                    <div class="stimulus-display" id="stimulusDisplay"></div>
+                </div>
+
+                <div class="feedback-message" id="feedbackMessage"></div>
+                <div class="feedback-text" id="feedbackText"></div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div class="trial-info" id="trialInfo">Trial 1 of ~30</div>
+            </div>
+        </div>
+
+        <!-- Results Page -->
+        <div class="page" id="resultsPage">
+            <div class="results-container">
+                <h1>Test Complete!</h1>
+                <div class="participant-id">Participant: <strong id="resultsParticipantId"></strong></div>
+
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>Average Reaction Time</h3>
+                        <div class="value" id="avgRT">—</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">milliseconds (correct responses only)</div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Total Trials</h3>
+                        <div class="value" id="totalTrials">—</div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Lapses (Too Slow)</h3>
+                        <div class="value" id="nLapses">—</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">RT ≥ 500 ms</div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Errors (Too Early)</h3>
+                        <div class="value" id="nCommissions">—</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">RT &lt; 100 ms or premature</div>
+                    </div>
+
+                    <div class="result-card full-width">
+                        <h3>Performance Score</h3>
+                        <div class="value" id="performanceScore">—</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">100% = perfect, 0% = worst</div>
+                    </div>
+
+                    <div class="result-card full-width">
+                        <h3>Fastest 10% Response Time</h3>
+                        <div class="value" id="fastest10">—</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">milliseconds</div>
+                    </div>
+
+                    <div class="result-card full-width">
+                        <h3>Slowest 10% Response Time</h3>
+                        <div class="value" id="slowest10">—</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">milliseconds</div>
+                    </div>
+                </div>
+
+                <div class="interpretation">
+                    <h3>Performance Interpretation</h3>
+                    <p id="interpretationText"></p>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="button" onclick="downloadResults()">Download Results (CSV)</button>
+                    <button class="button button-secondary" onclick="restart()">Run Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== EXPERIMENT STATE =====
+        let experimentState = {
+            participantNumber: null,
+            totalTime: 180000, // 3 minutes in ms (PVT-B)
+            minRT: 100,
+            lapseThreshold: 500,
+            showDetailedFeedback: true,
+            
+            // Trial tracking
+            trialCount: 0,
+            correctRTs: [],
+            lapses: 0,
+            commissions: 0,
+            allTrials: [],
+            
+            // Timing
+            experimentStartTime: null,
+            trialStartTime: null,
+            stimulusOnsetTime: null,
+            stimulusPresent: false,
+            feedbackEndTime: null,
+            
+            // Flags
+            isExperimentRunning: false,
+            stimulusResponseReceived: false,
+            currentTrialRT: null,
+            currentOutcome: null
+        };
+
+        // ===== ENTRY PAGE =====
+        function handleEntrySubmit(event) {
+            event.preventDefault();
+            const input = document.getElementById('participantNumber').value;
+            const errorMsg = document.getElementById('errorMessage');
+            
+            if (!/^\d{3}$/.test(input)) {
+                errorMsg.classList.add('show');
+                return;
+            }
+            
+            errorMsg.classList.remove('show');
+            experimentState.participantNumber = input;
+            showInstructions();
+        }
+
+        function showInstructions() {
+            document.getElementById('entryPage').classList.remove('active');
+            document.getElementById('instructionsPage').classList.add('active');
+        }
+
+        // ===== EXPERIMENT CONTROL =====
+        function showExperiment() {
+            document.getElementById('instructionsPage').classList.remove('active');
+            document.getElementById('experimentPage').classList.add('active');
+            startExperiment();
+        }
+
+        function startExperiment() {
+            experimentState.isExperimentRunning = true;
+            experimentState.experimentStartTime = performance.now();
+            runExperimentLoop();
+        }
+
+        function runExperimentLoop() {
+            const now = performance.now();
+            const elapsedTime = now - experimentState.experimentStartTime;
+
+            // Check if experiment time is exceeded
+            if (elapsedTime >= experimentState.totalTime) {
+                endExperiment();
+                return;
+            }
+
+            // Handle trial logic
+            if (!experimentState.stimulusPresent) {
+                startNewTrial();
+            } else if (experimentState.stimulusPresent && !experimentState.stimulusResponseReceived) {
+                // Update stimulus timer display
+                if (experimentState.stimulusOnsetTime) {
+                    const stimulusElapsed = now - experimentState.stimulusOnsetTime;
+                    displayStimulus(Math.round(stimulusElapsed));
+                }
+
+                // Check for timeout (30 seconds max per trial)
+                const trialElapsed = now - experimentState.trialStartTime;
+                if (trialElapsed > 30000) {
+                    recordLapse(now);
+                    showFeedback('TOO SLOW', 'You did not respond in time', 'error');
+                    experimentState.stimulusPresent = false;
+                    experimentState.stimulusResponseReceived = false;
+                    experimentState.feedbackEndTime = now + 1000;
+                }
+            }
+
+            // Show feedback if time has passed
+            if (experimentState.feedbackEndTime && now >= experimentState.feedbackEndTime) {
+                clearFeedback();
+                experimentState.feedbackEndTime = null;
+            }
+
+            // Update progress
+            const progress = (elapsedTime / experimentState.totalTime) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // Estimate trials (assuming ~2 trials per second on average)
+            const estimatedTrials = Math.ceil((elapsedTime / experimentState.totalTime) * 30);
+            document.getElementById('trialInfo').textContent = `Trial ${experimentState.trialCount + 1} of ~30 | Time: ${Math.round(elapsedTime / 1000)}s`;
+
+            // Continue loop
+            if (experimentState.isExperimentRunning) {
+                requestAnimationFrame(runExperimentLoop);
+            }
+        }
+
+        function startNewTrial() {
+            experimentState.trialCount++;
+            experimentState.trialStartTime = performance.now();
+            experimentState.stimulusResponseReceived = false;
+
+            // Random delay between 0-3000ms (PVT-B parameters)
+            const randomDelay = Math.random() * 3000;
+
+            setTimeout(() => {
+                if (experimentState.isExperimentRunning && !experimentState.stimulusResponseReceived) {
+                    experimentState.stimulusPresent = true;
+                    experimentState.stimulusOnsetTime = performance.now();
+                }
+            }, randomDelay);
+        }
+
+        function displayStimulus(timeValue) {
+            document.getElementById('stimulusDisplay').textContent = String(timeValue).padStart(5, '0');
+        }
+
+        function clearFeedback() {
+            document.getElementById('feedbackMessage').textContent = '';
+            document.getElementById('feedbackText').textContent = '';
+            document.getElementById('stimulusDisplay').textContent = '';
+        }
+
+        function showFeedback(message, subtext = '', type = '') {
+            const feedbackEl = document.getElementById('feedbackMessage');
+            feedbackEl.textContent = message;
+            feedbackEl.className = 'feedback-message';
+            if (type) feedbackEl.classList.add(type);
+            
+            if (subtext) {
+                document.getElementById('feedbackText').textContent = subtext;
+            } else {
+                document.getElementById('feedbackText').textContent = '';
+            }
+        }
+
+        // ===== RESPONSE HANDLING =====
+        document.addEventListener('keydown', function(event) {
+            if (event.code === 'Space' && experimentState.isExperimentRunning) {
+                event.preventDefault();
+                handleSpacebarResponse();
+            }
+        });
+
+        function handleSpacebarResponse() {
+            const now = performance.now();
+
+            if (!experimentState.stimulusPresent) {
+                // Too early - pressed before stimulus
+                recordCommission(now);
+                showFeedback('ERROR', 'You pressed too early. Wait for the yellow numbers to appear.', 'error');
+                experimentState.feedbackEndTime = now + 1000;
+                return;
+            }
+
+            // Calculate actual RT since stimulus onset
+            const actualRT = now - experimentState.stimulusOnsetTime;
+
+            experimentState.stimulusResponseReceived = true;
+            experimentState.currentTrialRT = actualRT;
+
+            if (actualRT >= experimentState.minRT && actualRT <= experimentState.lapseThreshold) {
+                // Correct response
+                recordCorrect(actualRT, now);
+                showFeedback(
+                    String(Math.round(actualRT)),
+                    'Good! Keep focused.',
+                    'correct'
+                );
+            } else if (actualRT < experimentState.minRT) {
+                // Too early
+                recordCommission(now);
+                showFeedback('ERROR', 'Too early. Wait for the numbers to appear.', 'error');
+            } else {
+                // Too slow (lapse)
+                recordLapse(now);
+                showFeedback('TOO SLOW', 'You need to respond faster (within 500ms).', 'warning');
+            }
+
+            experimentState.feedbackEndTime = now + 1000;
+            experimentState.stimulusPresent = false;
+        }
+
+        function recordCorrect(rt, timestamp) {
+            experimentState.correctRTs.push(rt);
+            experimentState.allTrials.push({
+                trial: experimentState.trialCount,
+                outcome: 'correct',
+                rt: Math.round(rt),
+                timestamp: timestamp - experimentState.experimentStartTime
+            });
+        }
+
+        function recordLapse(timestamp) {
+            experimentState.lapses++;
+            experimentState.allTrials.push({
+                trial: experimentState.trialCount,
+                outcome: 'lapse',
+                rt: null,
+                timestamp: timestamp - experimentState.experimentStartTime
+            });
+        }
+
+        function recordCommission(timestamp) {
+            experimentState.commissions++;
+            experimentState.allTrials.push({
+                trial: experimentState.trialCount,
+                outcome: 'commission',
+                rt: null,
+                timestamp: timestamp - experimentState.experimentStartTime
+            });
+        }
+
+        // ===== RESULTS CALCULATION =====
+        function calculateResults() {
+            const results = {};
+
+            // Average RT (correct responses only)
+            if (experimentState.correctRTs.length > 0) {
+                const sum = experimentState.correctRTs.reduce((a, b) => a + b, 0);
+                results.averageRT = Math.round(sum / experimentState.correctRTs.length);
+            } else {
+                results.averageRT = null;
+            }
+
+            // Fastest 10% of correct RTs
+            if (experimentState.correctRTs.length > 0) {
+                const sorted = [...experimentState.correctRTs].sort((a, b) => a - b);
+                const index = Math.ceil(sorted.length * 0.1) - 1;
+                results.fastest10 = Math.round(sorted[index]);
+            } else {
+                results.fastest10 = null;
+            }
+
+            // Slowest 10% of correct RTs
+            if (experimentState.correctRTs.length > 0) {
+                const sorted = [...experimentState.correctRTs].sort((a, b) => b - a);
+                const index = Math.ceil(sorted.length * 0.1) - 1;
+                results.slowest10 = Math.round(sorted[index]);
+            } else {
+                results.slowest10 = null;
+            }
+
+            // Performance score: 100% - (lapses + commissions) / total trials
+            const totalStimuli = experimentState.trialCount;
+            const errors = experimentState.lapses + experimentState.commissions;
+            results.performanceScore = Math.max(0, Math.round((1 - (errors / totalStimuli)) * 100));
+
+            results.totalTrials = experimentState.trialCount;
+            results.correctResponses = experimentState.correctRTs.length;
+            results.lapses = experimentState.lapses;
+            results.commissions = experimentState.commissions;
+
+            return results;
+        }
+
+        function getInterpretation(results) {
+            const score = results.performanceScore;
+
+            if (score >= 90) {
+                return `Excellent performance! Your average reaction time of ${results.averageRT}ms demonstrates strong alertness and attention. You made very few errors, indicating consistent focus throughout the test.`;
+            } else if (score >= 70) {
+                return `Good performance. Your average reaction time of ${results.averageRT}ms shows adequate vigilance. Some lapses or early responses were detected, but overall performance is solid.`;
+            } else if (score >= 50) {
+                return `Moderate performance. Your average reaction time of ${results.averageRT}ms suggests some attention lapses. Consider focusing more intently on the task and maintaining consistency.`;
+            } else {
+                return `Performance below optimal levels. Your average reaction time of ${results.averageRT}ms indicates possible fatigue or difficulty maintaining attention. Multiple lapses and/or early responses were detected.`;
+            }
+        }
+
+        // ===== END EXPERIMENT =====
+        function endExperiment() {
+            experimentState.isExperimentRunning = false;
+            displayResults();
+        }
+
+        function displayResults() {
+            const results = calculateResults();
+
+            // Update HTML with results
+            document.getElementById('resultsParticipantId').textContent = experimentState.participantNumber;
+            document.getElementById('avgRT').textContent = results.averageRT !== null ? results.averageRT + ' ms' : '—';
+            document.getElementById('totalTrials').textContent = results.totalTrials;
+            document.getElementById('nLapses').textContent = results.lapses;
+            document.getElementById('nCommissions').textContent = results.commissions;
+            document.getElementById('performanceScore').textContent = results.performanceScore + '%';
+            document.getElementById('fastest10').textContent = results.fastest10 !== null ? results.fastest10 + ' ms' : '—';
+            document.getElementById('slowest10').textContent = results.slowest10 !== null ? results.slowest10 + ' ms' : '—';
+            document.getElementById('interpretationText').textContent = getInterpretation(results);
+
+            // Switch pages
+            document.getElementById('experimentPage').classList.remove('active');
+            document.getElementById('resultsPage').classList.add('active');
+        }
+
+        // ===== DATA EXPORT =====
+        function downloadResults() {
+            const results = calculateResults();
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            
+            // Prepare CSV content
+            let csv = `Brief Psychomotor Vigilance Test (PVT-B) Results\n`;
+            csv += `========================================\n\n`;
+            csv += `Participant Number,${experimentState.participantNumber}\n`;
+            csv += `Test Date,${new Date().toISOString()}\n\n`;
+            csv += `Summary Results\n`;
+            csv += `Average Reaction Time (ms),${results.averageRT !== null ? results.averageRT : 'N/A'}\n`;
+            csv += `Total Trials,${results.totalTrials}\n`;
+            csv += `Correct Responses,${results.correctResponses}\n`;
+            csv += `Lapses (>= 500ms),${results.lapses}\n`;
+            csv += `Errors (< 100ms or premature),${results.commissions}\n`;
+            csv += `Performance Score (%),${results.performanceScore}\n`;
+            csv += `Fastest 10% RT (ms),${results.fastest10 !== null ? results.fastest10 : 'N/A'}\n`;
+            csv += `Slowest 10% RT (ms),${results.slowest10 !== null ? results.slowest10 : 'N/A'}\n\n`;
+            
+            csv += `Trial-by-Trial Data\n`;
+            csv += `Trial,Outcome,Reaction Time (ms),Time from Start (ms)\n`;
+            experimentState.allTrials.forEach(trial => {
+                const rt = trial.rt !== null ? trial.rt : '';
+                csv += `${trial.trial},${trial.outcome},${rt},${trial.timestamp}\n`;
+            });
+
+            // Create blob and download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.setAttribute('href', URL.createObjectURL(blob));
+            link.setAttribute('download', `PVT-B_P${experimentState.participantNumber}_${timestamp}.csv`);
+            link.click();
+        }
+
+        function restart() {
+            // Reset state
+            experimentState = {
+                participantNumber: null,
+                totalTime: 180000,
+                minRT: 100,
+                lapseThreshold: 500,
+                showDetailedFeedback: true,
+                trialCount: 0,
+                correctRTs: [],
+                lapses: 0,
+                commissions: 0,
+                allTrials: [],
+                experimentStartTime: null,
+                trialStartTime: null,
+                stimulusOnsetTime: null,
+                stimulusPresent: false,
+                feedbackEndTime: null,
+                isExperimentRunning: false,
+                stimulusResponseReceived: false,
+                currentTrialRT: null,
+                currentOutcome: null
+            };
+
+            // Reset UI
+            document.getElementById('resultsPage').classList.remove('active');
+            document.getElementById('entryPage').classList.add('active');
+            document.getElementById('participantNumber').value = '';
+            document.getElementById('errorMessage').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
